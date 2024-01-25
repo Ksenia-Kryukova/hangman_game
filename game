@@ -1,0 +1,144 @@
+import random
+word_list = ['голова', 'весна', 'кот', 'книга', 'собака', 'звон', 'карта', 'метод', 'жираф', 'олень']
+
+def get_word():
+    word = random.choice(word_list).upper()
+    return word
+    
+def display_hangman(tries):
+    stages = [  # финальное состояние: голова, торс, обе руки, обе ноги
+                '''
+                   --------
+                   |      |
+                   |      O
+                   |     \\|/
+                   |      |
+                   |     / \\
+                   -
+                ''',
+                # голова, торс, обе руки, одна нога
+                '''
+                   --------
+                   |      |
+                   |      O
+                   |     \\|/
+                   |      |
+                   |     / 
+                   -
+                ''',
+                # голова, торс, обе руки
+                '''
+                   --------
+                   |      |
+                   |      O
+                   |     \\|/
+                   |      |
+                   |      
+                   -
+                ''',
+                # голова, торс и одна рука
+                '''
+                   --------
+                   |      |
+                   |      O
+                   |     \\|
+                   |      |
+                   |     
+                   -
+                ''',
+                # голова и торс
+                '''
+                   --------
+                   |      |
+                   |      O
+                   |      |
+                   |      |
+                   |     
+                   -
+                ''',
+                # голова
+                '''
+                   --------
+                   |      |
+                   |      O
+                   |    
+                   |      
+                   |     
+                   -
+                ''',
+                # начальное состояние
+                '''
+                   --------
+                   |      |
+                   |      
+                   |    
+                   |      
+                   |     
+                   -
+                '''
+    ]
+    return stages[tries]
+
+def play(word):
+    word_completion = '_' * len(word)  # строка, содержащая символы _ на каждую букву задуманного слова
+    guessed_letters = []               # список уже названных букв
+    guessed_words = []                 # список уже названных слов
+    tries = 6                          # количество попыток
+    
+    print('Давайте играть в угадайку слов!')
+    print(display_hangman(tries))
+    print('Загаданное слово -', word_completion)
+    
+    while True:
+        s = input('Введите слово или букву').upper()
+        if not s.isalpha():
+            print('Ошибка')
+            continue
+        elif s in guessed_letters or s in guessed_words:
+            print('Вы уже вводили это, попробуйте еще раз')
+            continue
+        elif len(s) > 1:
+            if s == word:
+                print('Поздравляем, вы угадали слово! Вы победили!') 
+                break
+            else:
+                print('Увы, это не то слово. Попробуйте еще раз')
+                guessed_words.append(s)
+                tries -= 1
+                if tries < 0:
+                    print('К сожалению, вы исчерпали все свои попытки и не угадали слово, загаданное слово -', word)
+                    break
+                print(display_hangman(tries))
+                continue
+        elif len(s) == 1:
+            if s in word:
+                print('Такая буква есть в слове')
+                word_completion_list = list(word_completion)
+                for i in range(len(word)):
+                    if s == word[i]:
+                        word_completion_list.insert(i, s)
+                        del word_completion_list[i + 1]
+                word_completion = ''.join(word_completion_list)
+                guessed_letters.append(s)
+                print(word_completion)
+                if word_completion == word:
+                        print('Поздравляем, вы угадали слово! Вы победили!')
+                        break
+            else:            
+                print('Увы, такой буквы нет. Попробуйте еще раз')
+                guessed_letters.append(s)
+                tries -= 1
+                if tries < 0:
+                    print('К сожалению, вы исчерпали все свои попытки и не угадали слово, загаданное слово -', word)
+                    break  
+                print(display_hangman(tries))
+                continue          
+        
+    
+word = get_word()
+play(word)
+
+again = input('Хотите сыграть еще раз? (да/нет)')
+if again == 'да':
+    word = get_word()
+    play(word)
